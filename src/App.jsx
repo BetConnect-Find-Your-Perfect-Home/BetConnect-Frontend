@@ -1,6 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
+import LandingPage from "./pages/LandingPage";
+import BrowsePage from "./pages/BrowsePage";
+
+
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
@@ -11,12 +15,16 @@ import AIChatPage from './pages/AIChatPage';
 
 import PublicNavbar from './components/layout/PublicNavbar';
 import AppShell from './components/layout/AppShell';
-
+import React from "react";
+import "./App.css";
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+         <Route path="/" element={<LandingPage />} />
+        <Route path="/browse" element={<BrowsePage />} />
+         
           {/* ==================== PUBLIC ROUTES ==================== */}
           <Route 
             path="/login" 
