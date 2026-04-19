@@ -7,6 +7,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AgentDashboard from './pages/AgentDashboard';
 import UserDashboard from './pages/UserDashboard';
 import AgentPayment from './pages/AgentPayment';
+import AIChatPage from './pages/AIChatPage';
 
 import PublicNavbar from './components/layout/PublicNavbar';
 import AppShell from './components/layout/AppShell';
@@ -58,6 +59,10 @@ function App() {
           {/* User Dashboard */}
           <Route path="/user" element={<AppShell />}>
             <Route index element={<UserDashboard />} />
+          </Route>
+          {/* AI Chat */}
+          <Route path="/ai-chat" element={<AppShell />}>
+            <Route index element={<AIChatPage />} />
           </Route>
 
           {/* Fallback Route */}
