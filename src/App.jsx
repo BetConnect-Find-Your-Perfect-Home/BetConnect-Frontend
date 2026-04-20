@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AgentDashboard from './pages/AgentDashboard';
 import UserDashboard from './pages/UserDashboard';
+import SavedHomesPage from './pages/SavedHomesPage';
 import AgentPayment from './pages/AgentPayment';
 import AIChatPage from './pages/AIChatPage';
 
@@ -43,6 +44,7 @@ function App() {
 
             <Route element={<RoleGate allowedRoles={['user']} />}>
               <Route path="/user" element={<UserDashboard />} />
+              <Route path="/user/saved" element={<SavedHomesPage />} />
             </Route>
 
           </Route>

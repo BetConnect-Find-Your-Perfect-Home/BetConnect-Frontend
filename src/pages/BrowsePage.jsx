@@ -16,7 +16,7 @@ const BrowsePage = () => {
     const fetchProperties = async () => {
       try{
         const {subcity, listingType, maxPrice} = filters;
-        const res = await API.get(`/properties? subcity=${subcity}&listingType=${listingType}&maxPrice=${maxPrice}`);
+        const res = await API.get(`/properties?subcity=${subcity}&listingType=${listingType}&maxPrice=${maxPrice}`);
         setProperties(res.data?.properties || []);
       }catch(err){
         console.error("Error fetching properties:", err);

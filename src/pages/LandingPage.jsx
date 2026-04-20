@@ -1,10 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { Search, Sparkles, Building2, MessageSquare, Home } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const featuredProperties = []; // This will be fetched via useEffect later
+  const featuredProperties = []; 
+  const {isAuthenticated} = useAuth();
 
   return (
     <div className="min-h-screen bg-white">
@@ -65,7 +67,7 @@ const LandingPage = () => {
           </p>
         </div>
         <button 
-          onClick={() => navigate("/ai-chat")}
+          onClick={() => navigate(isAuthenticated ? "/ai-chat" : "/login")}
           className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-5 rounded-2xl font-bold text-xl flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-orange-900/20"
         >
           Start AI Chat 🤖
