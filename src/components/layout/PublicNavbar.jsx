@@ -1,42 +1,68 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Shield } from 'lucide-react';
+import { Shield, Sparkles, Building2, Search } from 'lucide-react';
 
 export default function PublicNavbar() {
   const location = useLocation();
 
-  return (
-    <header className="h-20 bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-            <Shield className="text-white" size={28} />
-          </div>
-          <div>
-            <span className="text-3xl font-bold tracking-tighter bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              BetConnect
-            </span>
-          </div>
-        </div>
+  const isActive = (path) => location.pathname === path;
 
-        {/* Auth Buttons */}
-        <div className="flex items-center gap-4">
+  return (
+    <header className="h-20 bg-white/90 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50 transition-all">
+      <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+        
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200 group-hover:scale-105 transition-transform">
+            <Shield className="text-white" size={24} />
+          </div>
+          <span className="text-2xl font-bold tracking-tighter bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            BetConnect
+          </span>
+        </Link>
+
+        <nav className="hidden md:flex items-center gap-1 bg-gray-50/50 p-1.5 rounded-2xl border border-gray-100">
           <Link
-            to="/login"
-            className={`px-8 py-3 text-sm font-semibold rounded-2xl transition-all ${
-              location.pathname === '/login'
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'text-gray-700 hover:bg-gray-100'
+            to="/browse"
+            className={`flex items-center gap-2 px-5 py-2 text-sm font-bold rounded-xl transition-all ${
+              isActive('/browse')
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-500 hover:text-gray-900'
             }`}
           >
-            Login
+            <Search size={16} />
+            Browse Homes
+          </Link>
+
+          <Link
+            to="/ai-chat"
+            className={`flex items-center gap-2 px-5 py-2 text-sm font-bold rounded-xl transition-all ${
+              isActive('/ai-chat')
+                ? 'bg-white text-indigo-600 shadow-sm'
+                : 'text-gray-500 hover:text-indigo-500'
+            }`}
+          >
+            <Sparkles size={16} className={isActive('/ai-chat') ? "text-indigo-500" : ""} />
+            AI Assistant
+          </Link>
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <Link
+            to="/login"
+            className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all ${
+              isActive('/login')
+                ? 'text-blue-600'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            Log In
           </Link>
 
           <Link
             to="/register"
-            className="px-8 py-3 text-sm font-semibold bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/30"
+            className="px-6 py-2.5 text-sm font-bold bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-all shadow-xl shadow-gray-200 flex items-center gap-2"
           >
             Get Started
+            <Building2 size={16} className="opacity-60" />
           </Link>
         </div>
       </div>

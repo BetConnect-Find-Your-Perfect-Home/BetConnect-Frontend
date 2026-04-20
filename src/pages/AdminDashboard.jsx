@@ -1,40 +1,49 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import API from '../services/api';
 import { Shield, Users, UserCheck, Clock } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const [pendingAgents, setPendingAgents] = useState([
-    {
-      id: '1',
-      name: "Alex Rivera",
-      email: "alex.rivera@gmail.com",
-      createdAt: "2026-04-15",
-      status: "pending"
-    },
-    {
-      id: '2',
-      name: "Maria Chen",
-      email: "maria.chen@outlook.com",
-      createdAt: "2026-04-16",
-      status: "pending"
-    },
-    {
-      id: '3',
-      name: "David Okon",
-      email: "david.okon@yahoo.com",
-      createdAt: "2026-04-17",
-      status: "pending"
+
+  const [pendingAgents, setPendingAgents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPendingAgents = async () => {
+      try{
+        const res = await API.get('admin/pending-agents');
+        setPendingAgents(res.data);
+
+      }catch(err){
+        console.error("Error fetching pending agents:", err);
+      }finally{
+        setLoading(false);
+      }
+    };
+    fetchPendingAgents();
+  }, []);
+
+  const approveAgent = async (id) => {
+    try{
+      await API.put(`/admin/approve-agent/${id}`);
+      setPendingAgents(prev => prev.filter(agent => agent.id !== id));
+      alert("✅ Agent Approved Successfully!");
+    }catch(err){
+      alert("❌ Failed to approve agent. Please try again.");
     }
-  ]);
 
-  const approveAgent = (id) => {
-    setPendingAgents(prev => prev.filter(agent => agent.id !== id));
-    alert("✅ Agent Approved Successfully!");
   };
 
-  const rejectAgent = (id) => {
-    setPendingAgents(prev => prev.filter(agent => agent.id !== id));
-    alert("❌ Agent Rejected");
+  const rejectAgent = async (id) => {
+    try{
+      await API.put(`/admin/reject-agent/${id}`);
+      setPendingAgents(prev => prev.filter(agent => agent.id !== id));
+      alert("❌ Agent Rejected");
+    }catch(err){
+      alert("❌ Failed to reject agent. Please try again.");
+    }
   };
+
+  if (loading) return <div className="p-20 text-center">Loading Portal...</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -96,6 +105,7 @@ export default function AdminDashboard() {
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-gray-900">{agent.name}</h3>
                   <p className="text-gray-600 mt-1">{agent.email}</p>
+                  <p className="text-gray-400 mt-1">Phone: {agent.phone}</p>
                   <p className="text-sm text-gray-500 mt-2">
                     Applied on: {agent.createdAt}
                   </p>
