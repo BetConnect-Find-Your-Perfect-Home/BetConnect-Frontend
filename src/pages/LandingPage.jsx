@@ -1,18 +1,18 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Search, Sparkles, Building2, MessageSquare, Home } from "lucide-react";
+import { Search, Sparkles, Building2, MessageSquare, Home, MapPin } from "lucide-react";
+// Dev 4: Import the mock data
+import { mockProperties } from "../data/mockProperties";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const featuredProperties = []; 
-  const {isAuthenticated} = useAuth();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <header className="relative h-[85vh] flex flex-col items-center justify-center text-white px-4">
-        {/* Background Overlay */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{ 
@@ -45,7 +45,7 @@ const LandingPage = () => {
             </select>
             <button 
               onClick={() => navigate("/browse")}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-xl font-bold transition-all"
+              className="bg-brand-orange hover:opacity-90 text-white px-10 py-4 rounded-xl font-bold transition-all"
             >
               Search
             </button>
@@ -53,10 +53,10 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* AI Section */}
-      <section className="mx-[5%] my-16 bg-blue-900 rounded-3xl p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 shadow-xl">
+      {/* AI Section - Styled with Brand Navy */}
+      <section className="mx-[5%] my-16 bg-brand-navy rounded-3xl p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 shadow-xl">
         <div className="md:max-w-[60%]">
-          <div className="flex items-center gap-2 mb-4 text-orange-400 font-bold uppercase tracking-widest text-sm">
+          <div className="flex items-center gap-2 mb-4 text-brand-orange font-bold uppercase tracking-widest text-sm">
             <Sparkles size={18} />
             <span>Smart Features</span>
           </div>
@@ -68,7 +68,7 @@ const LandingPage = () => {
         </div>
         <button 
           onClick={() => navigate(isAuthenticated ? "/ai-chat" : "/login")}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-5 rounded-2xl font-bold text-xl flex items-center gap-3 transition-transform hover:scale-105 shadow-lg shadow-orange-900/20"
+          className="bg-brand-orange hover:scale-105 text-white px-8 py-5 rounded-2xl font-bold text-xl flex items-center gap-3 transition-transform shadow-lg shadow-orange-900/20"
         >
           Start AI Chat 🤖
         </button>
@@ -78,21 +78,43 @@ const LandingPage = () => {
       <section className="px-[5%] py-12">
         <div className="flex justify-between items-end mb-10">
           <div>
-            <h2 className="text-4xl font-bold text-gray-900">Featured Properties</h2>
+            <h2 className="text-4xl font-bold text-brand-navy">Featured Properties</h2>
             <p className="text-gray-500 text-lg mt-2">Handpicked listings for you in Addis</p>
           </div>
-          <button onClick={() => navigate("/browse")} className="border-2 border-gray-900 px-6 py-2 font-bold hover:bg-gray-900 hover:text-white transition-all">
+          <button onClick={() => navigate("/browse")} className="border-2 border-brand-navy text-brand-navy px-6 py-2 font-bold hover:bg-brand-navy hover:text-white transition-all rounded-lg">
             View All
           </button>
         </div>
 
-        {/* Property Grid */}
+        {/* Property Grid - Now populated with mock data */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProperties.length > 0 ? (
-            featuredProperties.map(p => (
-              <div key={p.id} className="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all">
-                {/* Card UI Logic here */}
-              </div>
+          {mockProperties.length > 0 ? (
+            mockProperties.slice(0, 3).map(p => (
+              <Link 
+                key={p.id} 
+                to={`/property/${p.id}`}
+                className="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all"
+              >
+                <div className="relative h-64 overflow-hidden">
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div className="absolute top-4 left-4 bg-brand-navy text-white text-xs font-bold px-3 py-1 rounded-full">
+                    {p.floor}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <p className="text-brand-orange font-bold text-xl mb-1">{p.price}</p>
+                  <h3 className="text-brand-navy font-bold text-lg mb-2">{p.title}</h3>
+                  <div className="flex items-center text-gray-400 text-sm gap-1 mb-4">
+                    <MapPin size={14} />
+                    <span>{p.location}</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-50 text-gray-500 text-sm">
+                    <span>{p.beds} Beds</span>
+                    <span>{p.baths} Baths</span>
+                    <span>{p.size}</span>
+                  </div>
+                </div>
+              </Link>
             ))
           ) : (
             <div className="col-span-full py-20 bg-gray-50 rounded-3xl text-center border-2 border-dashed border-gray-200">
@@ -104,7 +126,7 @@ const LandingPage = () => {
 
       {/* How it Works */}
       <section className="bg-gray-50 py-24 text-center px-4">
-        <h2 className="text-4xl font-bold mb-16 text-gray-900">How BetConnect Works</h2>
+        <h2 className="text-4xl font-bold mb-16 text-brand-navy">How BetConnect Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
           {[
             { icon: <Search size={40}/>, t: "Search", d: "Find your dream home using filters." },
@@ -112,10 +134,10 @@ const LandingPage = () => {
             { icon: <Home size={40}/>, t: "Find", d: "Get the keys to your new living space." }
           ].map((step, i) => (
             <div key={i} className="flex flex-col items-center">
-              <div className="w-20 h-20 bg-white shadow-md rounded-2xl flex items-center justify-center text-orange-500 mb-6">
+              <div className="w-20 h-20 bg-white shadow-md rounded-2xl flex items-center justify-center text-brand-orange mb-6">
                 {step.icon}
               </div>
-              <h3 className="text-xl font-bold mb-3">{step.t}</h3>
+              <h3 className="text-xl font-bold mb-3 text-brand-navy">{step.t}</h3>
               <p className="text-gray-600 leading-relaxed">{step.d}</p>
             </div>
           ))}
@@ -123,7 +145,7 @@ const LandingPage = () => {
       </section>
 
       <footer className="py-12 text-center border-t border-gray-100">
-        <h2 className="text-2xl font-black text-orange-500 mb-2">BetConnect</h2>
+        <h2 className="text-2xl font-black text-brand-orange mb-2">BetConnect</h2>
         <p className="text-gray-400">© 2026 Ethiopia's Smartest Real Estate Hub.</p>
       </footer>
     </div>

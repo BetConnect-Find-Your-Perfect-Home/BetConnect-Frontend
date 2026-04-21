@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: '/api',
-    // baseURL: import.meta.env.VITE_API_URL,
-    // baseURL: import.meta.env.REACT_APP_API_URL
+    // Replace 5000 with your actual backend port
+    baseURL: 'http://localhost:5000/api', 
 });
 
+// This interceptor is correct—it attaches the 'key' to every request
 API.interceptors.request.use((req) => {
     const token = localStorage.getItem('token');
     if (token) {
