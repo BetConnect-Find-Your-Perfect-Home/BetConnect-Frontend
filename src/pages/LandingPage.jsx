@@ -1,18 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Search, Sparkles, Building2, MessageSquare, Home } from "lucide-react";
+import API from "../services/api"; // 1. Import API
+import PropertyCard from "../components/common/PropertyCard"; // 2. Import Reusable Card
+import { Search, Sparkles, Building2, MessageSquare, Home, Loader2 } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const featuredProperties = []; 
-  const {isAuthenticated} = useAuth();
+  const { isAuthenticated } = useAuth();
+  
+  // 3. State for data and loading
+  const [featuredProperties, setFeaturedProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // 4. Fetch properties on component mount
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        // Fetch properties with a limit of 3 for the landing page
+        const res = await API.get("/property?limit=3");
+        setFeaturedProperties(res.data?.properties || []);
+      } catch (err) {
+        console.error("Error fetching featured properties:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
+      {/* Hero Section stays the same... */}
       <header className="relative h-[85vh] flex flex-col items-center justify-center text-white px-4">
-        {/* Background Overlay */}
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
           style={{ 
@@ -28,7 +48,6 @@ const LandingPage = () => {
             Modern real estate marketplace connecting you with trusted agents across Ethiopia
           </p>
 
-          {/* Search Bar */}
           <div className="mt-12 bg-white p-2 rounded-2xl flex flex-col md:flex-row gap-2 shadow-2xl w-full max-w-3xl mx-auto">
             <div className="flex-1 flex items-center px-4 bg-gray-50 rounded-xl border border-gray-100">
               <Search className="text-gray-400" size={20} />
@@ -53,7 +72,7 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* AI Section */}
+      {/* AI Section stays the same... */}
       <section className="mx-[5%] my-16 bg-blue-900 rounded-3xl p-10 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10 shadow-xl">
         <div className="md:max-w-[60%]">
           <div className="flex items-center gap-2 mb-4 text-orange-400 font-bold uppercase tracking-widest text-sm">
@@ -74,35 +93,49 @@ const LandingPage = () => {
         </button>
       </section>
 
-      {/* Featured Properties Section */}
+      {/* Featured Properties Section - UPDATED */}
       <section className="px-[5%] py-12">
         <div className="flex justify-between items-end mb-10">
           <div>
             <h2 className="text-4xl font-bold text-gray-900">Featured Properties</h2>
             <p className="text-gray-500 text-lg mt-2">Handpicked listings for you in Addis</p>
           </div>
-          <button onClick={() => navigate("/browse")} className="border-2 border-gray-900 px-6 py-2 font-bold hover:bg-gray-900 hover:text-white transition-all">
+          <button 
+            onClick={() => navigate("/browse")} 
+            className="border-2 border-gray-900 px-6 py-2 font-bold hover:bg-gray-900 hover:text-white transition-all rounded-xl"
+          >
             View All
           </button>
         </div>
 
-        {/* Property Grid */}
+        {/* Property Grid with Real Data */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProperties.length > 0 ? (
-            featuredProperties.map(p => (
-              <div key={p.id} className="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all">
-                {/* Card UI Logic here */}
-              </div>
+          {loading ? (
+            // Loading Spinner
+            <div className="col-span-full py-20 flex flex-col items-center justify-center text-gray-400">
+              <Loader2 className="animate-spin mb-4" size={40} />
+              <p className="font-bold">Fetching latest properties...</p>
+            </div>
+          ) : featuredProperties.length > 0 ? (
+            // Map through real data using the reusable Card component
+            featuredProperties.map((property) => (
+              <PropertyCard 
+                key={property._id} 
+                property={property} 
+                isBookmarked={false} // You can add global bookmark state if needed
+                onBookmarkToggle={() => navigate(isAuthenticated ? "/user/saved" : "/login")}
+              />
             ))
           ) : (
+            // Empty state
             <div className="col-span-full py-20 bg-gray-50 rounded-3xl text-center border-2 border-dashed border-gray-200">
-              <p className="text-gray-400 font-medium">Fetching real-time data from backend...</p>
+              <p className="text-gray-400 font-medium text-xl">No properties listed yet. Check back later!</p>
             </div>
           )}
         </div>
       </section>
 
-      {/* How it Works */}
+      {/* How it Works stays the same... */}
       <section className="bg-gray-50 py-24 text-center px-4">
         <h2 className="text-4xl font-bold mb-16 text-gray-900">How BetConnect Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">

@@ -25,7 +25,7 @@ export default function UserDashboard() {
         // Fetch real data for stats and recent listings
         const [propsRes, bookmarksRes] = await Promise.all([
           API.get('/property?limit=5'),
-          API.get('/bookmarks/mine') // Assuming Dev 3 finished this
+          API.get('/bookmarks') // Assuming Dev 3 finished this
         ]);
 
         const allProps = propsRes.data.properties;

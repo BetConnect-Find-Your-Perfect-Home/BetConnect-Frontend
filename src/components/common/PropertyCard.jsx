@@ -4,9 +4,26 @@ import { Heart, Bed, Bath, Maximize, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function PropertyCard({ property, isBookmarked, onBookmarkToggle }) {
+
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  const getImageUrl = () => {
+    if (!property.images || property.images.length === 0) {
+      return 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800'; 
+    }
+
+    const firstImage = property.images[0];
+
+    if (firstImage.startsWith('http')) return firstImage;
+
+    const cleanPath = firstImage.replace(/\\/g, '/'); 
+    
+    return `http://localhost:5000/${cleanPath}`;
+  };
+
+  const imageUrl = getImageUrl();
+  
   const handleBookmarkClick = (e) => {
     e.preventDefault(); 
     e.stopPropagation();
@@ -19,10 +36,6 @@ export default function PropertyCard({ property, isBookmarked, onBookmarkToggle 
     
     onBookmarkToggle(property._id);
   };
-
-  const imageUrl = property.images?.[0]?.startsWith('http') 
-    ? property.images[0] 
-    : `http://localhost:5000/${property.images?.[0]}`;
 
   return (
     <div 

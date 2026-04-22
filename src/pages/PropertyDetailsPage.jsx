@@ -41,7 +41,10 @@ export default function PropertyDetailsPage() {
       {/* SECTION 1: IMAGE CAROUSEL */}
       <div className="relative w-full h-125 rounded-[2.5rem] overflow-hidden shadow-2xl bg-gray-100 mb-10 group">
         <img 
-          src={property.images[currentImg]?.startsWith('http') ? property.images[currentImg] : `http://localhost:5000/${property.images[currentImg]}`} 
+          src={property.images[currentImg]?.replace(/\\/g, '/').startsWith('http')
+            ? property.images[currentImg].replace(/\\/g, '/') 
+            : `http://localhost:5000/${property.images[currentImg]?.replace(/\\/g, '/')}`}
+
           className="w-full h-full object-cover transition-opacity duration-500"
           alt="property"
         />

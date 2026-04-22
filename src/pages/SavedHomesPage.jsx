@@ -18,7 +18,7 @@ export default function SavedHomesPage() {
 
   const fetchBookmarks = async () => {
     try {
-      const res = await API.get('/bookmarks/mine');
+      const res = await API.get('/bookmarks');
       // Assuming backend returns an array of objects where 'property' is populated
       setBookmarks(res.data); 
     } catch (err) {

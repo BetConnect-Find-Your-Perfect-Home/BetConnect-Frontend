@@ -46,8 +46,8 @@ const BrowsePage = () => {
         setProperties(propRes.data.properties);
 
         if (isAuthenticated) {
-          const favRes = await API.get('/bookmarks/mine');
-          const ids = favRes.data.map(b => b.property._id || b.property);
+          const favRes = await API.get('/bookmarks');
+          const ids = favRes.data.map(b => b.property?._id || b.property);
           setBookmarkedIds(ids);
         }
       } catch (err) {
