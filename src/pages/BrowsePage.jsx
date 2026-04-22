@@ -42,7 +42,7 @@ const BrowsePage = () => {
  useEffect(() => {
     const fetchData = async () => {
       try {
-        const propRes = await API.get('/properties');
+        const propRes = await API.get('/property');
         setProperties(propRes.data.properties);
 
         if (isAuthenticated) {
