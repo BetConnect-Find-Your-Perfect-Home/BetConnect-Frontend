@@ -14,6 +14,7 @@ import UserDashboard from './pages/UserDashboard';
 import SavedHomesPage from './pages/SavedHomesPage';
 import AgentPayment from './pages/AgentPayment';
 import AIChatPage from './pages/AIChatPage';
+import PropertyDetailsPage from './pages/PropertyDetailsPage';
 
 import RoleGate from './components/auth/RoleGate';
 function App() {
@@ -25,6 +26,8 @@ function App() {
 
           <Route element={<><PublicNavbar /><LandingPage /></>} path="/" />
           <Route element={<><PublicNavbar /><BrowsePage /></>} path="/browse" />
+          <Route element={<><PublicNavbar /><PropertyDetailsPage /></>} path="/property/:id" />
+
           <Route element={<><PublicNavbar /><LoginPage /></>} path="/login" />
           <Route element={<><PublicNavbar /><RegisterPage /></>} path="/register" />
 

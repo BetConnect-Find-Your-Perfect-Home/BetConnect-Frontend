@@ -11,7 +11,7 @@ export default function AgentDashboard() {
   const fetchMyProperties = async () => {
     try {
 
-      const res = await API.get('/properties/mine'); 
+      const res = await API.get('/property/mine'); 
       setProperties(res.data);
     } catch (err) {
       console.error("Error fetching properties");
