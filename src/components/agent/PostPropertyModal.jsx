@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import API from '../../services/api';
-import { X, Upload, Sparkles, Home, Info, AlignLeft } from 'lucide-react';
+import { X, Upload, Sparkles, Home, Info, AlignLeft, CheckCircle } from 'lucide-react';
 
 export default function PostPropertyModal({ isOpen, onClose, onRefresh }) {
   const [loading, setLoading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [successData, setSuccessData] = useState(null);
   
   const [formData, setFormData] = useState({
     listingType: 'rent',
@@ -22,11 +23,35 @@ export default function PostPropertyModal({ isOpen, onClose, onRefresh }) {
   });
 
   const handleFileChange = (e) => {
-    setSelectedFiles([...e.target.files]);
+    setSelectedFiles([...selectedFiles, ...e.target.files]);
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleClose = () => {
+    setSuccessData(null);
+    setFormData({
+      listingType: 'rent',
+      type: 'apartment', 
+      subcity: 'Bole',
+      woreda: '',
+      kebele: '',
+      price: '',
+      size: '',
+      floor: '',
+      specialName: '',
+      description: '',
+      bedrooms: '',
+      bathrooms: '', 
+    });
+    setSelectedFiles([]);
+    onClose();
   };
 
   const handleSubmit = async (e) => {
@@ -56,11 +81,10 @@ export default function PostPropertyModal({ isOpen, onClose, onRefresh }) {
         data.append('images', file);
       });
 
-      await API.post('/property', data);
+      const res = await API.post('/properties', data);
 
-      alert("🚀 Listed! AI has generated your professional description.");
+      setSuccessData(res.data);
       onRefresh(); 
-      onClose();   
     } catch (err) {
       alert(err.response?.data?.message || err.response?.data?.errors?.map(e => e.msg).join(', ') || "Please check all required fields");
     } finally {
@@ -70,11 +94,43 @@ export default function PostPropertyModal({ isOpen, onClose, onRefresh }) {
 
   if (!isOpen) return null;
 
+  if (successData) {
+    return (
+      <div className="fixed inset-0 bg-zinc-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-[2.5rem] w-full max-w-lg p-10 text-center relative shadow-[0_8px_40px_rgb(0,0,0,0.12)]">
+          <div className="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-green-100">
+            <CheckCircle size={48} />
+          </div>
+          <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">Property Listed!</h2>
+          <p className="text-gray-500 font-medium mb-8 text-[15px]">
+            Your property is live. Our AI has generated a professional description below.
+          </p>
+          
+          <div className="bg-blue-50/70 p-6 rounded-2xl border border-blue-100/50 text-left mb-8 shadow-sm relative">
+            <p className="text-[11px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2 mb-3">
+              <Sparkles size={14} className="text-blue-500" /> AI Generated Description
+            </p>
+            <p className="text-gray-700 text-[15px] leading-relaxed italic font-medium">
+              "{successData.aiDescription}"
+            </p>
+          </div>
+
+          <button
+            onClick={handleClose}
+            className="w-full py-4 bg-gray-900 text-white rounded-2xl font-bold text-lg hover:bg-black hover:scale-[1.02] transition-all shadow-xl active:scale-[0.98]"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-zinc-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-4xl w-full max-w-3xl max-h-[92vh] overflow-y-auto p-8 md:p-12 relative shadow-2xl">
+      <div className="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[92vh] overflow-y-auto p-8 md:p-12 relative shadow-[0_8px_40px_rgb(0,0,0,0.12)]">
         
-        <button onClick={onClose} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors">
+        <button onClick={handleClose} className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 bg-gray-50 hover:bg-gray-100 p-2 rounded-full transition-all active:scale-95 shadow-sm border border-gray-100 z-50">
           <X size={28} />
         </button>
 
@@ -174,15 +230,40 @@ export default function PostPropertyModal({ isOpen, onClose, onRefresh }) {
             ></textarea>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-4">
             <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Property Gallery</label>
-            <div className="relative group border-2 border-dashed border-gray-100 rounded-3xl p-10 hover:border-blue-400 hover:bg-blue-50/30 transition-all text-center cursor-pointer">
-              <input type="file" multiple onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" />
-              <Upload size={32} className="mx-auto text-gray-300 mb-2 group-hover:text-blue-500" />
-              <p className="text-sm font-bold text-gray-400 group-hover:text-blue-600">
-                {selectedFiles.length > 0 ? `${selectedFiles.length} photos selected` : "Upload property photos"}
+            <div className="relative group border-2 border-dashed border-gray-200 rounded-3xl p-10 hover:border-blue-400 hover:bg-blue-50/50 transition-all text-center cursor-pointer bg-gray-50/30">
+              <input type="file" multiple onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+              <Upload size={32} className="mx-auto text-gray-400 mb-3 group-hover:text-blue-500 transition-colors" />
+              <p className="text-sm font-bold text-gray-500 group-hover:text-blue-600 transition-colors">
+                Drop photos here or click to browse
               </p>
+              <p className="text-xs font-semibold text-gray-400 mt-2">JPEG, PNG, WEBP</p>
             </div>
+            
+            {/* Visual Grid for uploaded files */}
+            {selectedFiles.length > 0 && (
+              <div className="grid grid-cols-4 md:grid-cols-5 gap-3 mt-4">
+                {selectedFiles.map((file, index) => (
+                  <div key={index} className="relative group rounded-2xl overflow-hidden aspect-square shadow-sm border border-gray-200 bg-white">
+                    <img 
+                      src={URL.createObjectURL(file)} 
+                      alt={`upload-preview-${index}`} 
+                      className="w-full h-full object-cover transition-transform group-hover:scale-110" 
+                    />
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); removeFile(index); }}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-600 shadow-md transform hover:scale-110 z-20"
+                    >
+                      <X size={14} />
+                    </button>
+                    {/* Add gradient overlay for better button visibility */}
+                    <div className="absolute inset-0 bg-linear-to-b from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <button
