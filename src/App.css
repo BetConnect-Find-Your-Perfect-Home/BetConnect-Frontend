@@ -182,3 +182,181 @@
     border-right-color: var(--border);
   }
 }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+}
+
+
+.app {
+  display: flex;
+  justify-content: center;
+  padding: 50px;
+}
+
+.card {
+  background:white;
+  color: black;
+  padding: 20px;
+  width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.top-title{
+  background-color:white;
+  color:black ;
+  font-size: 20px;
+}
+
+.contact-btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  background: black;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.contact-btn:hover {
+  background: #222;
+}
+
+
+.report-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  width: 100%;
+  color: red;
+  background: black;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.report-btn:hover {
+  background: black;
+  color: yellow;
+  transform: translateY(-1px);
+}
+
+.report-btn:active {
+  transform: scale(0.97);
+}
+
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  width: 340px;
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: pop 0.18s ease;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.modal-title::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #ef4444;
+  border-radius: 50%;
+  margin-right: 8px;
+  transform: translateY(-2px);
+}
+
+@keyframes pop {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+
+.modal select,
+.modal textarea {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  outline: none;
+  transition: 0.2s;
+}
+
+.modal select:focus,
+.modal textarea:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+}
+
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.cancel {
+  flex: 1;
+  padding: 9px;
+  background: #ef4444;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.cancel:hover {
+  background: black;
+  color: yellow;
+}
+
+.submit {
+  flex: 1;
+  padding: 9px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.submit:hover {
+  background: black;
+  color: yellow;
+}
+
+.submit:disabled {
+  background: #f87171;
+  cursor: not-allowed;
+}
