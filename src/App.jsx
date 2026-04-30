@@ -5,52 +5,67 @@ import { AuthProvider } from './context/AuthContext';
 import "./App.css"; 
 
 // Page Imports
+import PublicNavbar from './components/layout/PublicNavbar';
+import DashboardLayout from './components/layout/DashboardLayout';
+
+import LandingPage from "./pages/LandingPage";
+import BrowsePage from "./pages/BrowsePage";
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AdminDashboard from './pages/AdminDashboard';
 import AgentDashboard from './pages/AgentDashboard';
 import UserDashboard from './pages/UserDashboard';
+import SavedHomesPage from './pages/SavedHomesPage';
 import AgentPayment from './pages/AgentPayment';
+import AIChatPage from './pages/AIChatPage';
 
-// Layout and Component Imports
-import PublicNavbar from './components/layout/PublicNavbar';
-import AppShell from './components/layout/AppShell';
 import ReportListing from './components/layout/ReportListing';
+import AnalyticsPage from './pages/AnalyticsPage';
+
+import RoleGate from './components/auth/RoleGate';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          {/* ==================== PUBLIC ROUTES ==================== */}
-          <Route path="/login" element={<><PublicNavbar /><LoginPage /></>} />
-          <Route path="/register" element={<><PublicNavbar /><RegisterPage /></>} />
+          
+          {/* ==================== 1. PUBLIC ROUTES ==================== */}
+          <Route element={<><PublicNavbar /><LandingPage /></>} path="/" />
+          <Route element={<><PublicNavbar /><BrowsePage /></>} path="/browse" />
+          <Route element={<><PublicNavbar /><LoginPage /></>} path="/login" />
+          <Route element={<><PublicNavbar /><RegisterPage /></>} path="/register" />
 
-          {/* ==================== PROTECTED ROUTES ==================== */}
-          <Route path="/admin" element={<AppShell />}><Route index element={<AdminDashboard />} /></Route>
-          <Route path="/agent" element={<AppShell />}><Route index element={<AgentDashboard />} /></Route>
-          <Route path="/user" element={<AppShell />}><Route index element={<UserDashboard />} /></Route>
+          {/* ==================== 2. PROTECTED DASHBOARDS ==================== */}
+          <Route element={<DashboardLayout />}>
+            
+            {/* AI Chat accessible to logged-in users */}
+            <Route path="/ai-chat" element={<AIChatPage />} />
 
-          {/* ==================== THE REPORT ROUTER ==================== */}
-          {/* Fixed: This is now INSIDE the Routes block */}
-          <Route path="/report/:id" element={<AppShell />}>
-            <Route 
-              index 
-              element={
-                <div className="app">
-                  <div className="card">
-                    <h1 className="top-title">
-                      Connecting to database... No properties to display yet.
-                    </h1>
-                    <ReportListing />
-                  </div>
-                </div>
-              } 
-            />
+            {/* ADMIN ROUTES */}
+            <Route element={<RoleGate allowedRoles={['admin']} />}>
+              <Route path="/admin" element={<AdminDashboard />} />
+              {/* 2. ADD THE ANALYTICS ROUTE HERE */}
+              <Route path="/admin/analytics" element={<AnalyticsPage />} />
+            </Route>
+
+            {/* AGENT ROUTES */}
+            <Route element={<RoleGate allowedRoles={['agent']} />}>
+              <Route path="/agent" element={<AgentDashboard />} />
+              <Route path="/agent/payment" element={<AgentPayment />} />
+            </Route>
+
+            {/* USER ROUTES */}
+            <Route element={<RoleGate allowedRoles={['user']} />}>
+              <Route path="/user" element={<UserDashboard />} />
+              <Route path="/user/saved" element={<SavedHomesPage />} />
+            </Route>
+
           </Route>
 
-          {/* Fallback Route */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* Catch-all redirect */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+          
         </Routes>
       </Router>
     </AuthProvider>
