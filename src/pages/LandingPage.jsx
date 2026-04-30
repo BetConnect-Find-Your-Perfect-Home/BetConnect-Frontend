@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import API from "../services/api"; // 1. Import API
-import PropertyCard from "../components/common/PropertyCard"; // 2. Import Reusable Card
+import API from "../services/api"; 
+import PropertyCard from "../components/common/PropertyCard"; 
 import { Search, Sparkles, Building2, MessageSquare, Home, Loader2 } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   
-  // 3. State for data and loading
   const [featuredProperties, setFeaturedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 4. Fetch properties on component mount
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        // Fetch properties with a limit of 3 for the landing page
         const res = await API.get("/property?limit=3");
         setFeaturedProperties(res.data?.properties || []);
       } catch (err) {
@@ -31,7 +28,6 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section stays the same... */}
       <header className="relative h-[85vh] flex flex-col items-center justify-center text-white px-4">
         <div 
           className="absolute inset-0 z-0 bg-cover bg-center"
@@ -117,12 +113,11 @@ const LandingPage = () => {
               <p className="font-bold">Fetching latest properties...</p>
             </div>
           ) : featuredProperties.length > 0 ? (
-            // Map through real data using the reusable Card component
-            featuredProperties.map((property) => (
+            featuredProperties.slice(0, 3).map((property) => (
               <PropertyCard 
                 key={property._id} 
                 property={property} 
-                isBookmarked={false} // You can add global bookmark state if needed
+                isBookmarked={false} 
                 onBookmarkToggle={() => navigate(isAuthenticated ? "/user/saved" : "/login")}
               />
             ))
@@ -157,7 +152,7 @@ const LandingPage = () => {
 
       <footer className="py-12 text-center border-t border-gray-100">
         <h2 className="text-2xl font-black text-orange-500 mb-2">BetConnect</h2>
-        <p className="text-gray-400">© 2026 Ethiopia's Smartest Real Estate Hub.</p>
+        <p className="text-gray-400">© 2026 Ethiopia's Smartest Property Hub.</p>
       </footer>
     </div>
   );

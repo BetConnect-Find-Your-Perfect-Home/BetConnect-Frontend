@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
 import PropertyCard from '../components/common/PropertyCard';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, X, Filter } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const BrowsePage = () => {
@@ -12,50 +12,40 @@ const BrowsePage = () => {
   const [bookmarkedIds, setBookmarkedIds] = useState([]);
 
   const [filters, setFilters] = useState({
+    keyword: '',
     subcity: '',
     listingType: '',
     type: '',
     maxPrice: 30000000
   });
 
-  const fetchProperties = async () => {
+const fetchData = async () => {
     setLoading(true);
     try {
-      const { subcity, listingType, type, maxPrice } = filters;
-      const res = await API.get(`/property?subcity=${subcity}&listingType=${listingType}&type=${type}&maxPrice=${maxPrice}`);
-      setProperties(res.data?.properties || []);
+      const { keyword, subcity, listingType, type, maxPrice } = filters;
       
+      const res = await API.get(`/property?keyword=${keyword}&subcity=${subcity}&listingType=${listingType}&type=${type}&maxPrice=${maxPrice}`);
+      setProperties(res.data?.properties || []);
+
+      if (isAuthenticated) {
+        const favRes = await API.get('/bookmarks');
+        const ids = favRes.data.map(b => b.property?._id || b.property);
+        setBookmarkedIds(ids);
+      }
     } catch (err) {
-      console.error("Error fetching properties:", err);
+      console.error("Error fetching data:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProperties();
-  }, [filters]);
+    fetchData();
+  }, [filters, isAuthenticated]);
 
   const handleFilterChange = (e) => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
- useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const propRes = await API.get('/property');
-        setProperties(propRes.data.properties);
-
-        if (isAuthenticated) {
-          const favRes = await API.get('/bookmarks');
-          const ids = favRes.data.map(b => b.property?._id || b.property);
-          setBookmarkedIds(ids);
-        }
-      } catch (err) {
-        console.error("Fetch error", err);
-      }
-    };
-    fetchData();
-  }, [isAuthenticated]);
 
   const handleBookmarkToggle = async (propertyId) => {
     const isCurrentlySaved = bookmarkedIds.includes(propertyId);
@@ -138,7 +128,7 @@ const BrowsePage = () => {
               className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
               min="0" 
               max="30000000" 
-              step="100000"
+              step="1000"
               value={price}
               onChange={(e) => {
                 setPrice(Number(e.target.value));
@@ -157,6 +147,30 @@ const BrowsePage = () => {
       </aside>
 
       <main className="flex-1 p-8 md:p-12 overflow-y-auto">
+        
+        <div className="mb-12">
+          <div className="max-w-2xl relative group">
+            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-600 transition-colors">
+              <Search size={22} />
+            </div>
+            <input 
+              type="text"
+              name="keyword"
+              placeholder="Search by area, special name, or keywords (e.g. 'Bole near mall')"
+              value={filters.keyword}
+              onChange={handleFilterChange}
+              className="w-full pl-14 pr-12 py-5 bg-white border border-gray-200 rounded-3xl shadow-sm outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all text-lg font-medium"
+            />
+            {filters.keyword && (
+              <button 
+                onClick={() => setFilters({...filters, keyword: ''})}
+                className="absolute inset-y-0 right-5 flex items-center text-gray-400 hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+            )}
+          </div>
+        </div>
         
         <div className="mb-10 flex justify-between items-end">
           <div>
