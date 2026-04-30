@@ -1,6 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 
+// Import CSS for the 'app' and 'card' styling
+import "./App.css"; 
+
+// Page Imports
 import PublicNavbar from './components/layout/PublicNavbar';
 import DashboardLayout from './components/layout/DashboardLayout';
 
@@ -15,7 +19,7 @@ import SavedHomesPage from './pages/SavedHomesPage';
 import AgentPayment from './pages/AgentPayment';
 import AIChatPage from './pages/AIChatPage';
 
-// 1. IMPORT YOUR NEW ANALYTICS PAGE
+import ReportListing from './components/layout/ReportListing';
 import AnalyticsPage from './pages/AnalyticsPage';
 
 import RoleGate from './components/auth/RoleGate';
