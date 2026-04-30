@@ -1,117 +1,198 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
-// import "../App.css"; // Removed custom CSS to use Tailwind
-
+import PropertyCard from '../components/common/PropertyCard';
+import { Search, Loader2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const BrowsePage = () => {
+  const { isAuthenticated } = useAuth();
   const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [price, setPrice] = useState(30000000);
+  const [bookmarkedIds, setBookmarkedIds] = useState([]);
+
   const [filters, setFilters] = useState({
     subcity: '',
     listingType: '',
+    type: '',
     maxPrice: 30000000
-  })
+  });
 
-  useEffect(()=> {
-    const fetchProperties = async () => {
-      try{
-        const {subcity, listingType, maxPrice} = filters;
-        const res = await API.get(`/properties?subcity=${subcity}&listingType=${listingType}&maxPrice=${maxPrice}`);
-        setProperties(res.data?.properties || []);
-      }catch(err){
-        console.error("Error fetching properties:", err);
-        setProperties([]);
-      }
-    };
+  const fetchProperties = async () => {
+    setLoading(true);
+    try {
+      const { subcity, listingType, type, maxPrice } = filters;
+      const res = await API.get(`/property?subcity=${subcity}&listingType=${listingType}&type=${type}&maxPrice=${maxPrice}`);
+      setProperties(res.data?.properties || []);
+      
+    } catch (err) {
+      console.error("Error fetching properties:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchProperties();
   }, [filters]);
 
+  const handleFilterChange = (e) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+ useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const propRes = await API.get('/property');
+        setProperties(propRes.data.properties);
+
+        if (isAuthenticated) {
+          const favRes = await API.get('/bookmarks');
+          const ids = favRes.data.map(b => b.property?._id || b.property);
+          setBookmarkedIds(ids);
+        }
+      } catch (err) {
+        console.error("Fetch error", err);
+      }
+    };
+    fetchData();
+  }, [isAuthenticated]);
+
+  const handleBookmarkToggle = async (propertyId) => {
+    const isCurrentlySaved = bookmarkedIds.includes(propertyId);
+
+    try {
+      if (isCurrentlySaved) {
+        await API.delete(`/bookmarks/${propertyId}`);
+        setBookmarkedIds(prev => prev.filter(id => id !== propertyId));
+      } else {
+        await API.post(`/bookmarks/${propertyId}`);
+        setBookmarkedIds(prev => [...prev, propertyId]);
+      }
+    } catch (err) {
+      console.error("Bookmark action failed", err);
+    }
+  };
 
   return (
-    <div className="w-screen h-[calc(100vh-65px)] flex">
-      <div className="flex w-full pt-16.25">
+    <div className="w-screen h-[calc(100vh-80px)] flex bg-gray-50">
+      
+      <aside className="w-80 bg-white border-r border-gray-200 p-8 overflow-y-auto hidden md:block">
+        <h3 className="text-xl font-black text-gray-900 mb-8 flex items-center gap-2">
+          <Search size={20} className="text-blue-600" /> Filters
+        </h3>
         
-        <aside className="w-100 bg-white text-black p-8 border-r border-gray-200 overflow-y-auto">
-          <h3 className="text-lg font-semibold text-black mb-6">Filters</h3>
-          
-          <div className="mb-5 text-black bg-white">
-            <label className="block text-sm font-semibold text-black mb-2">Listing Type</label>
-            <select className="w-full p-3 border border-gray-300 rounded-lg outline-none"><option>All</option><option>For Sale</option><option>For Rent</option></select>
-          </div>
-
-          <div className="mb-5 text-black bg-white">
-            <label className="block text-sm font-semibold text-black mb-2">Property Type</label>
-            <select className="w-full p-3 border border-gray-300 rounded-lg outline-none">
-              <option>All Types</option>
-              <option>House</option>
-              <option>Apartment</option>
-              <option>Villa</option>
-              <option>Commercial</option>
+        <div className="space-y-6">
+          <div>
+            <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Offer Type</label>
+            <select 
+              name="listingType" 
+              value={filters.listingType} 
+              onChange={handleFilterChange}
+              className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl font-bold outline-none focus:ring-2 focus:ring-blue-500/10"
+            >
+              <option value="">All Offers</option>
+              <option value="sale">For Sale</option>
+              <option value="rent">For Rent</option>
             </select>
           </div>
 
-          
-          <div className="mb-5">
-            <label className="block text-sm font-bold text-black mb-3 underline">Price Range</label>
-            <div className="text-sm text-gray-600 mb-3">
-              0 - {Number(price).toLocaleString()} ETB
+          <div>
+            <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Property Type</label>
+            <select 
+              name="type" 
+              value={filters.type} 
+              onChange={handleFilterChange}
+              className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl font-bold outline-none"
+            >
+              <option value="">All Types</option>
+              <option value="house">House</option>
+              <option value="apartment">Apartment</option>
+              <option value="villa">Villa</option>
+              <option value="commercial">Commercial</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Subcity</label>
+            <select 
+              name="subcity" 
+              value={filters.subcity} 
+              onChange={handleFilterChange}
+              className="w-full p-3 bg-gray-50 border border-gray-100 rounded-xl font-bold outline-none"
+            >
+              <option value="">All Subcities</option>
+              <option value="Bole">Bole</option>
+              <option value="Yeka">Yeka</option>
+              <option value="Arada">Arada</option>
+              <option value="Kirkos">Kirkos</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Max Price</label>
+            <div className="text-sm font-bold text-blue-600 mb-4">
+              Up to {price.toLocaleString()} ETB
             </div>
-            <div className="relative">
-              <input 
-                type="range" 
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                min="0" 
-                max="30000000" 
-                step="100000"
-                value={price}
-                onChange={(e) => {
-                  const newPrice = Number(e.target.value);
-                  setPrice(newPrice);
-                  setFilters(prev => ({ ...prev, maxPrice: newPrice }));
-                }}
-              />
-            </div>
+            <input 
+              type="range" 
+              className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              min="0" 
+              max="30000000" 
+              step="100000"
+              value={price}
+              onChange={(e) => {
+                setPrice(Number(e.target.value));
+              }}
+              onMouseUp={() => setFilters(prev => ({ ...prev, maxPrice: price }))}
+            />
           </div>
 
-          <div className="mb-5">
-            <label className="block text-sm font-semibold text-black mb-2">Location</label>
-            <select className="w-full p-3 border border-gray-300 rounded-lg outline-none"><option>All Subcities</option><option>Bole</option><option>Yeka</option><option>Arada</option></select>
-          </div>
-
-          <div className="mb-5">
-            <label className="block text-sm font-semibold text-black mb-2">Bedrooms</label>
-            <select className="w-full p-3 border border-gray-300 rounded-lg outline-none"><option>Any</option><option>2+</option><option>3+</option><option>4+</option></select>
-          </div>
-
-          
-          <div className="mb-5">
-            <label className="block text-sm font-semibold text-black mb-2">Size (m²)</label>
-            <select className="w-full p-3 border border-gray-300 rounded-lg outline-none"><option>Any</option><option>100+m²</option><option>200+m²</option><option>500+m²</option></select>
-          </div>
-
-          <button className="w-full bg-orange-500 text-white py-3 px-4 rounded-lg font-bold cursor-pointer hover:bg-orange-600 transition-colors">
-            Apply Filter
+          <button 
+            onClick={() => setFilters({ subcity: '', listingType: '', type: '', maxPrice: 30000000 })}
+            className="w-full py-3 text-gray-400 font-bold text-sm hover:text-red-500 transition-colors"
+          >
+            Clear All Filters
           </button>
-        </aside>
+        </div>
+      </aside>
 
+      <main className="flex-1 p-8 md:p-12 overflow-y-auto">
         
-            <main className="flex-1 text-black bg-gray-50 p-10 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-                {(properties || []).map((house) => (
-                  <div key={house._id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                    <img src={house.images[0] || 'default-house.jpg'} alt="House" className="w-full h-48 object-cover" />
-                    <div className="p-4">
-                      <p className="text-orange-500 text-xl font-bold mb-2">{house.price.toLocaleString()} ETB</p>
-                      <h4 className="text-gray-900 text-lg font-semibold mb-1">{house.type} in {house.subcity}</h4>
-                      <p className="text-gray-600 text-sm mb-2">Woreda: {house.woreda}, Kebele: {house.kebele}</p>
-                      {/* AI Description injection */}
-                      <p className="text-xs italic text-blue-600">{house.aiDescription}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </main>
-      </div>
+        <div className="mb-10 flex justify-between items-end">
+          <div>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Available Properties</h1>
+            <p className="text-gray-500 font-medium">Found {properties.length} results matching your search</p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center h-96 text-gray-400">
+            <Loader2 className="animate-spin mb-4" size={40} />
+            <p className="font-bold">Updating listings...</p>
+          </div>
+        ) : properties.length === 0 ? (
+          <div className="bg-white rounded-4xl p-20 text-center border border-gray-100 shadow-sm">
+            <p className="text-gray-400 font-bold text-xl">No properties found with these filters.</p>
+            <button 
+               onClick={() => setFilters({ subcity: '', listingType: '', type: '', maxPrice: 30000000 })}
+               className="mt-4 text-blue-600 font-bold hover:underline"
+            >
+              Reset all filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            {properties.map((house) => (
+              <PropertyCard 
+                key={house._id} 
+                property={house} 
+                isBookmarked={bookmarkedIds.includes(house._id)}
+                onBookmarkToggle={handleBookmarkToggle}
+              />
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   );
 };

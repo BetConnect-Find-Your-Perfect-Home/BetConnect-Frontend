@@ -18,7 +18,7 @@ export default function SavedHomesPage() {
 
   const fetchBookmarks = async () => {
     try {
-      const res = await API.get('/bookmarks/mine');
+      const res = await API.get('/bookmarks');
       // Assuming backend returns an array of objects where 'property' is populated
       setBookmarks(res.data); 
     } catch (err) {
@@ -90,15 +90,21 @@ export default function SavedHomesPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {bookmarks.map((bookmark) => {
-            const property = bookmark.property; // The populated property object
+            const property = bookmark.property; 
+
+            const imageUrl = property?.images?.[0]
+            ? `http://localhost:5000/${property.images[0].replace(/\\/g, '/')}`
+            : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800';
+
             return (
               <div key={bookmark._id} className="group bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all relative">
                 {/* Image Section */}
                 <div className="relative h-60 overflow-hidden">
                   <img 
-                    src={property?.images?.[0] || 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=800'} 
+                    src={imageUrl} 
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    alt="property"
+                    alt="saved-home"
+                    onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800' }}
                   />
                   <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tighter text-blue-600">
                     For {property?.listingType}

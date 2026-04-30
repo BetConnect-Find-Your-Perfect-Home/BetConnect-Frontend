@@ -16,16 +16,18 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    try{
+    try {
+      console.log('[LoginPage] handleSubmit: email', email);
       const loggedUser = await login(email, password);
-
-      if(loggedUser.role === 'admin') navigate('/admin');
-      else if(loggedUser.role === 'agent'){
+      console.log('[LoginPage] loggedUser:', loggedUser);
+      if (loggedUser.role === 'admin') navigate('/admin');
+      else if (loggedUser.role === 'agent') {
         navigate('/agent');
-      }else navigate('/user');
-    }catch(err){
+      } else navigate('/user');
+    } catch (err) {
+      console.error('[LoginPage] login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please try again.');
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
