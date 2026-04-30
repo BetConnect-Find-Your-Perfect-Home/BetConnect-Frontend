@@ -1,152 +1,52 @@
-// import React, { useState, useRef, useEffect } from 'react';
-// import API from '../services/api';
-
-// const Navbar = () => (
-//   <nav className="navbar">
-//     <div className="navbar-brand">
-//       <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-//       <span>BetConnect</span>
-//     </div>
-//     <div className="navbar-links">
-//       <a href="#">Browse Properties</a>
-//       <a href="#" className="bold">Login</a>
-//       <button className="signup-btn">Sign Up</button>
-//     </div>
-//   </nav>
-// );
-
-// const MessageBubble = ({ message }) => (
-//   <>
-//     <div className="message-row">
-//       <div className="avatar">
-//         <svg viewBox="0 0 24 24">
-//           <path d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zm-2 10H6V7h12v12zm-9-6c-.83 0-1.5-.67-1.5-1.5S8.17 10 9 10s1.5.67 1.5 1.5S9.83 13 9 13zm7.5-1.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM8 15h8v2H8v-2z"/>
-//         </svg>
-//       </div>
-//       <div className="bubble">{message.text}</div>
-//     </div>
-//     <div className="timestamp">{message.time}</div>
-//   </>
-// );
-
-// const AIChatPage = () => {
-//   const [messages, setMessages] = useState([{
-//     id: 1,
-//     sender: 'ai',
-//     text: "Hello! I'm your AI real estate assistant. I can help you find the perfect property in Addis Ababa. What are you looking for? You can tell me about your budget, preferred location, number of bedrooms, or any other requirements.",
-//     time: '09:55 AM',
-//   }]);
-//   const [inputValue, setInputValue] = useState('');
-//   const messagesEndRef = useRef(null);
-
-//   useEffect(() => {
-//     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-//   }, [messages]);
-
-//   const getCurrentTime = () =>
-//     new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-//   const handleSend = async () => {
-//     if (!inputValue.trim()) return;
-
-//     const userMsg = { id: Date.now(), sender: 'user', text: inputValue, time: getCurrentTime() };
-//     setMessages(prev => [...prev, userMsg]);
-//      const currentInput = inputValue;
-//     setInputValue('');
-
-//     try {
-//         const res = await API.post('/ai/chat', { message: currentInput });
-        
-//         const aiMsg = {
-//           id: Date.now() + 1,
-//           sender: 'ai',
-//           text: res.data.response, 
-//           time: getCurrentTime(),
-//         };
-//         setMessages(prev => [...prev, aiMsg]);
-//       } catch (err) {
-//           const errorMsg = {
-//             id: Date.now() + 1,
-//             sender: 'ai',
-//             text: "I'm sorry, I'm having trouble connecting to my brain. Please try again.",
-//             time: getCurrentTime(),
-//           };
-//           setMessages(prev => [...prev, errorMsg]);
-//       }
-//   };
-
-//   return (
-//     <div className="page">
-//       <Navbar />
-
-//       <div className="page-header">
-//         <div className="page-header-icon">
-//           <svg viewBox="0 0 24 24">
-//             <path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74z"/>
-//           </svg>
-//         </div>
-//         <div>
-//           <h1>AI Property Assistant</h1>
-//           <p>Tell me what you're looking for, and I'll help you find it</p>
-//         </div>
-//       </div>
-
-//       <div className="chat-area">
-//         {messages.map(msg => <MessageBubble key={msg.id} message={msg} />)}
-//         <div ref={messagesEndRef} />
-//       </div>
-
-//       <div className="input-bar">
-//         <div className="input-row">
-//           <input
-//             type="text"
-//             value={inputValue}
-//             onChange={e => setInputValue(e.target.value)}
-//             onKeyDown={e => e.key === 'Enter' && handleSend()}
-//             placeholder="Type your message... (e.g., 'I need a 3 bedroom house in Bole')"
-//           />
-//           <button className="send-btn" onClick={handleSend}>
-//             <svg viewBox="0 0 24 24">
-//               <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-//             </svg>
-//           </button>
-//         </div>
-//         <p className="input-hint">💡 Try: "Show me apartments in Bole", "I need a house to buy", "3 bedroom properties"</p>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AIChatPage;
-
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, Search, MessageSquare } from 'lucide-react';
+import { Send, Bot, User, Sparkles, Loader2, Search } from 'lucide-react';
 import API from '../services/api';
+import PropertyCard from '../components/common/PropertyCard'; // Import our reusable card
 
 const MessageBubble = ({ message }) => {
   const isAi = message.sender === 'ai';
 
   return (
-    <div className={`flex flex-col mb-6 ${isAi ? 'items-start' : 'items-end'}`}>
-      <div className={`flex items-start gap-3 max-w-[85%] md:max-w-[70%] ${isAi ? 'flex-row' : 'flex-row-reverse'}`}>
-        {/* Avatar */}
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${
-          isAi ? 'bg-indigo-600 text-white' : 'bg-blue-600 text-white'
+    <div className={`flex flex-col mb-8 ${isAi ? 'items-start' : 'items-end'}`}>
+      <div className={`flex items-start gap-4 max-w-[95%] md:max-w-[85%] ${isAi ? 'flex-row' : 'flex-row-reverse'}`}>
+        
+        {/* Avatar Area */}
+        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${
+          isAi ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-blue-600 border-blue-400 text-white'
         }`}>
-          {isAi ? <Bot size={20} /> : <User size={20} />}
+          {isAi ? <Bot size={22} /> : <User size={22} />}
         </div>
 
-        {/* Bubble */}
-        <div className={`p-4 rounded-2xl shadow-xs text-[15px] leading-relaxed ${
-          isAi 
-            ? 'bg-white text-gray-800 border border-gray-100 rounded-tl-none' 
-            : 'bg-blue-600 text-white rounded-tr-none'
-        }`}>
-          {message.text}
+        {/* Content Area */}
+        <div className="flex flex-col gap-4 w-full">
+          {/* Text Bubble */}
+          <div className={`p-5 rounded-3xl shadow-xs text-[15px] leading-relaxed ${
+            isAi 
+              ? 'bg-white text-gray-800 border border-gray-100 rounded-tl-none' 
+              : 'bg-blue-600 text-white rounded-tr-none shadow-blue-100 shadow-lg'
+          }`}>
+            {message.text}
+          </div>
+
+          {/* DYNAMIC PROPERTY CARDS - Renders real cards inside the chat */}
+          {isAi && message.properties && message.properties.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {message.properties.map((prop) => (
+                <div key={prop._id} className="w-full">
+                   <PropertyCard 
+                     property={prop} 
+                     isBookmarked={false} // Connect to global context if needed
+                     onBookmarkToggle={() => {}} 
+                   />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      <span className="text-[11px] text-gray-400 mt-2 px-14 font-medium uppercase tracking-tighter">
+      
+      {/* Timestamp */}
+      <span className={`text-[10px] text-gray-400 mt-2 font-black uppercase tracking-widest ${isAi ? 'ml-14' : 'mr-14'}`}>
         {message.time}
       </span>
     </div>
@@ -157,20 +57,26 @@ const AIChatPage = () => {
   const [messages, setMessages] = useState([{
     id: 1,
     sender: 'ai',
-    text: "Hello! I'm your BetConnect AI Assistant. Tell me what kind of home you are looking for in Addis, and I'll search our database for you instantly.",
+    text: "Hello! I'm your BetConnect Smart Assistant. Tell me exactly what you're looking for (location, budget, size), and I'll find the best matches from our database instantly.",
     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    properties: []
   }]);
+  
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom on new message
-  useEffect(() => {
+  // Auto-scroll logic
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages, isTyping]);
 
   const handleSend = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isTyping) return;
 
     const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const userMsg = { id: Date.now(), sender: 'user', text: inputValue, time: userTime };
@@ -181,22 +87,25 @@ const AIChatPage = () => {
     setIsTyping(true);
 
     try {
-      // Connect to our real Node.js Backend AI route
+      // 1. Hit the AI route we discussed (returns { response, properties })
       const res = await API.post('/ai/chat', { message: currentInput });
       
       const aiMsg = {
         id: Date.now() + 1,
         sender: 'ai',
         text: res.data.response, 
+        properties: res.data.properties || [], // Store real DB objects here
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
+      
       setMessages(prev => [...prev, aiMsg]);
     } catch (err) {
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         sender: 'ai',
-        text: "I'm sorry, I'm having trouble searching the database right now. Please try again later.",
+        text: "I'm having trouble searching the database. Could you try rephrasing your search?",
         time: userTime,
+        properties: []
       }]);
     } finally {
       setIsTyping(false);
@@ -204,66 +113,73 @@ const AIChatPage = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)]">
-      {/* AI Page Header */}
-      <div className="flex items-center justify-between mb-8">
+    <div className="flex flex-col h-[calc(100vh-140px)] max-w-5xl mx-auto px-4">
+      {/* Chat Header */}
+      <div className="flex items-center justify-between mb-8 shrink-0">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
-            <Sparkles size={28} className="animate-pulse" />
+          <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center shadow-inner">
+            <Sparkles size={24} className="animate-pulse" />
           </div>
           <div>
-            <h1 className="text-3xl font-black text-gray-900 tracking-tight">AI Smart Search</h1>
-            <p className="text-gray-500 font-medium">Powered by Llama-3 & BetConnect Real Estate Data</p>
+            <h1 className="text-2xl font-black text-gray-900 tracking-tight">AI Smart Search</h1>
+            <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">Connected to Live Database</p>
           </div>
         </div>
       </div>
 
       {/* Chat History Area */}
-      <div className="flex-1 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-gray-200">
+      <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
         {messages.map(msg => <MessageBubble key={msg.id} message={msg} />)}
         
         {isTyping && (
-          <div className="flex items-center gap-2 text-gray-400 text-sm animate-pulse ml-14 mb-6">
-            <Bot size={16} />
-            <span>AI is searching listings...</span>
+          <div className="flex items-center gap-3 text-gray-400 text-sm animate-pulse ml-14 mb-10">
+            <Loader2 className="animate-spin" size={18} />
+            <span className="font-bold tracking-tight">AI is analyzing listings...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Bar Section */}
-      <div className="pt-6">
-        <div className="bg-white p-4 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100">
+      {/* Footer Input Section */}
+      <div className="pt-6 shrink-0">
+        <div className="bg-white p-3 rounded-4xl shadow-2xl shadow-indigo-100 border border-gray-100">
           <div className="flex items-center gap-3">
+            <div className="pl-4 text-indigo-400">
+              <Search size={22} />
+            </div>
             <input
               type="text"
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSend()}
-              placeholder="e.g., 'Find a 2 bedroom apartment in Bole under 20,000 ETB'"
-              className="flex-1 bg-gray-50 p-4 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500/20 border border-transparent focus:border-indigo-100 text-gray-700 transition-all"
+              placeholder="Search e.g. '2 bedroom in Bole under 30k'"
+              className="flex-1 py-4 bg-transparent outline-none text-[16px] font-medium text-gray-700 placeholder:text-gray-300"
             />
             <button 
               onClick={handleSend}
-              disabled={isTyping}
-              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white p-4 rounded-2xl transition-all shadow-lg shadow-indigo-100 flex items-center justify-center"
+              disabled={!inputValue.trim() || isTyping}
+              className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 text-white w-14 h-14 rounded-2xl transition-all shadow-lg shadow-indigo-200 flex items-center justify-center active:scale-90"
             >
               <Send size={24} />
             </button>
           </div>
           
-          <div className="flex gap-2 mt-4 overflow-x-auto pb-2 no-scrollbar">
-            {['Apartments in Bole', 'Cheap rent near CMC', 'G+2 for sale'].map((suggestion) => (
+          {/* Quick Suggestions Chips */}
+          <div className="flex gap-2 mt-3 px-2 overflow-x-auto no-scrollbar pb-1">
+            {['Bole Apartments', 'CMC Villas', 'Rent under 15k'].map((tag) => (
               <button 
-                key={suggestion}
-                onClick={() => setInputValue(suggestion)}
-                className="text-[11px] font-bold text-gray-400 bg-gray-50 hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors whitespace-nowrap uppercase tracking-wider"
+                key={tag}
+                onClick={() => setInputValue(tag)}
+                className="text-[10px] font-black text-gray-400 bg-gray-50 hover:bg-gray-100 border border-gray-100 px-4 py-2 rounded-xl transition-all whitespace-nowrap uppercase tracking-widest"
               >
-                {suggestion}
+                {tag}
               </button>
             ))}
           </div>
         </div>
+        <p className="text-center text-[10px] text-gray-300 mt-4 font-medium italic">
+          BetConnect AI uses real-time data to find your match.
+        </p>
       </div>
     </div>
   );

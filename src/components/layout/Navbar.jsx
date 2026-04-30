@@ -35,7 +35,6 @@ export default function Navbar() {
           </p>
         </div>
 
-        {/* Global Search Bar - Figma Standard */}
         <div className="hidden md:flex items-center bg-gray-50 border border-gray-100 px-4 py-2.5 rounded-2xl w-full max-w-md focus-within:border-blue-300 focus-within:bg-white transition-all">
           <Search size={18} className="text-gray-400" />
           <input 
@@ -46,10 +45,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Right: Status & Profile */}
       <div className="flex items-center gap-6">
         
-        {/* Agent Verification Status Badge */}
         {user?.role === 'agent' && (
           <div className={`hidden sm:flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold ${
             user?.status === 'approved' 

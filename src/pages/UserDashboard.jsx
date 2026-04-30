@@ -19,19 +19,25 @@ export default function UserDashboard() {
   const [recent, setRecent] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const getCleanImageUrl = (path) => {
+    if (!path) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=400';
+    const normalizedPath = path.replace(/\\/g, '/');
+    return normalizedPath.startsWith('http') 
+      ? normalizedPath 
+      : `http://localhost:5000/${normalizedPath}`;
+  };
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch real data for stats and recent listings
         const [propsRes, bookmarksRes] = await Promise.all([
           API.get('/property?limit=5'),
-          API.get('/bookmarks') // Assuming Dev 3 finished this
+          API.get('/bookmarks')
         ]);
 
         const allProps = propsRes.data.properties;
         setRecent(allProps.slice(0, 3));
         
-        // Calculate counts for the hero cards
         setStats({
           rental: allProps.filter(p => p.listingType === 'rent').length,
           sale: allProps.filter(p => p.listingType === 'sale').length,
@@ -117,9 +123,10 @@ export default function UserDashboard() {
             {recent.map((item) => (
               <div key={item._id} className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
                 <img 
-                  src={item.images?.[0] || 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=200'} 
+                  src={getCleanImageUrl(item.images?.[0])}
                   className="w-24 h-24 rounded-xl object-cover" 
                   alt="property"
+                  onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=200' }}
                 />
                 <div className="flex-1">
                   <span className="text-[10px] font-black uppercase tracking-tighter text-blue-600 bg-blue-50 px-2 py-1 rounded">
