@@ -28,6 +28,10 @@ export default function SavedHomesPage() {
     }
   };
 
+      const backendBase = import.meta.env.PROD 
+    ? import.meta.env.VITE_IMAGE_API_URL 
+    : "http://localhost:5000";
+
   useEffect(() => {
     fetchBookmarks();
   }, []);
@@ -93,7 +97,7 @@ export default function SavedHomesPage() {
             const property = bookmark.property; 
 
             const imageUrl = property?.images?.[0]
-            ? `http://localhost:5000/${property.images[0].replace(/\\/g, '/')}`
+            ? `${backendBase}/${property.images[0].replace(/\\/g, '/')}`
             : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=800';
 
             return (

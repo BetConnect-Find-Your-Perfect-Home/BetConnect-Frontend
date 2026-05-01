@@ -20,11 +20,16 @@ export default function UserDashboard() {
   const [loading, setLoading] = useState(true);
 
   const getCleanImageUrl = (path) => {
+    
+    const backendBase = import.meta.env.PROD 
+    ? import.meta.env.VITE_IMAGE_API_URL 
+    : "http://localhost:5000";
+
     if (!path) return 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?q=80&w=400';
     const normalizedPath = path.replace(/\\/g, '/');
     return normalizedPath.startsWith('http') 
       ? normalizedPath 
-      : `http://localhost:5000/${normalizedPath}`;
+      : `${backendBase}/${normalizedPath}`;
   };
 
   useEffect(() => {

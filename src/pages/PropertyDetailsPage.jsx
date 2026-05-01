@@ -16,6 +16,10 @@ export default function PropertyDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [currentImg, setCurrentImg] = useState(0);
 
+    const backendBase = import.meta.env.PROD 
+    ? import.meta.env.VITE_IMAGE_API_URL 
+    : "http://localhost:5000";
+
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -43,7 +47,7 @@ export default function PropertyDetailsPage() {
         <img 
           src={property.images[currentImg]?.replace(/\\/g, '/').startsWith('http')
             ? property.images[currentImg].replace(/\\/g, '/') 
-            : `http://localhost:5000/${property.images[currentImg]?.replace(/\\/g, '/')}`}
+            : `${backendBase}/${property.images[currentImg]?.replace(/\\/g, '/')}`}
 
           className="w-full h-full object-cover transition-opacity duration-500"
           alt="property"
