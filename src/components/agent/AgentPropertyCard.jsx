@@ -2,9 +2,14 @@ import React from 'react';
 import { Trash2, Edit3, MapPin, Sparkles, Bed, Bath, Maximize } from 'lucide-react';
 
 export default function AgentPropertyCard({ property, onDelete }) {
+  
+  const backendBase = import.meta.env.PROD 
+    ? import.meta.env.VITE_API_URL 
+    : "http://localhost:5000";
+
   const imageUrl = property.images?.[0]?.startsWith('http') 
     ? property.images[0] 
-    : `http://localhost:5000/${property.images?.[0]}`;
+    : `${backendBase}/${property.images?.[0]}`;
 
   return (
     <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden group">

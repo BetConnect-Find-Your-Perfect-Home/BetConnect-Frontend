@@ -19,7 +19,11 @@ export default function PropertyCard({ property, isBookmarked, onBookmarkToggle 
 
     const cleanPath = firstImage.replace(/\\/g, '/'); 
     
-    return `http://localhost:5000/${cleanPath}`;
+     const backendBase = import.meta.env.PROD 
+    ? import.meta.env.VITE_IMAGE_API_URL 
+    : "http://localhost:5000";
+
+    return `${backendBase}/${cleanPath}`;
   };
 
   const imageUrl = getImageUrl();
